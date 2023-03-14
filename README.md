@@ -42,10 +42,25 @@ go get go.mongodb.org/mongo-driver/mongo
 
 ```
 
-And for the project, we need to run docker image of mongo at the version of 4.4.
+And for the project, we need to run mongo with docker(with mongo:4.4).
 
 ```bash
-docker run --name <container name you want> -d mongo:4.4
+docker run -d --name <container name you want> -p <port on host>:<port on container> mongo:4.4
+
+```
+
+For example:
+
+```bash
+docker run -d --name mongo_container -p 27017:27017 mongo:4.4
+
+
+```
+
+Then using below order to check if container is running.
+
+```bash
+docker ps
 
 ```
 

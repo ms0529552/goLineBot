@@ -1,0 +1,8 @@
+name: "goLineBot"
+mongo:
+  port: 27017
+  address: "mongodb://localhost:"
+line:
+  channel:
+    secret: "2891d85529f24c74abb330f45c1f6ec0"
+    access_token: "V1ANwfZYSw9AFfKrhjCu+vsGnnCyknawzvDbuHz3XyK83sRKN2OzR70zRkDpUd4Nii84SbwrdFhrTJpZxhMLibnxzefRnyMFgb7sxJV4GdOnSgzBJXOFaxT3j+U0D9FiMx1lda+buTS6n0xOU0ztcAdB04t89/1O/w1cDnyilFU="
