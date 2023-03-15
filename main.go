@@ -46,7 +46,7 @@ func main() {
 	if err != nil {
 		panic("linebot connect error " + err.Error())
 	}
-	app.POST("/test", func(c *gin.Context) {
+	app.POST("/repeat", func(c *gin.Context) {
 		events, err := bot.ParseRequest(c.Request)
 		if err != nil {
 			if err == linebot.ErrInvalidSignature {
@@ -68,8 +68,37 @@ func main() {
 				}
 			}
 		}
+	})
+
+	app.POST("/send", func(c *gin.Context) {
+		message := c.PostForm("message")
+		if message == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "請提供訊息內容",
+			})
+			return
+		}
+
+		sendingMessage := linebot.NewTextMessage(message)
+		usersList, err := service.GetUsersList()
+		if err != nil {
+			log.Print(err)
+			return
+		}
+
+		for _, user := range usersList {
+			_, err = bot.PushMessage(user.UserID, sendingMessage).Do()
+			if err != nil {
+				log.Print(err)
+				return
+			}
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": "The message has been sent successfully",
+		})
 
 	})
+
 	app.Run(":8080")
 
 }
