@@ -123,61 +123,61 @@ go run main.go
 
 #### Response
 
-`{
-    "messages list": [
-        {
-            "id": "17807235074942",
-            "user_id": "U604fef6644e218cc6a1a8925391d30fe",
-            "type": "",
-            "text": "test8:53",
-            "created_at": "2023-03-15T12:54:01.01Z"
-        },
-        {
-            "id": "17807243183240",
-            "user_id": "Uaf4f4b8ceec9e6a90d366fa93156d580",
-            "type": "",
-            "text": "teSt2055",
-            "created_at": "2023-03-15T12:55:31.29Z"
-        },
-        {
-            "id": "17807249427867",
-            "user_id": "Uaf4f4b8ceec9e6a90d366fa93156d580",
-            "type": "",
-            "text": "hello",
-            "created_at": "2023-03-15T12:56:40.493Z"
-        },
+    {
+        "messages list": [
+            {
+                "id": "17807235074942",
+                "user_id": "U604fef6644e218cc6a1a8925391d30fe",
+                "type": "",
+                "text": "test8:53",
+                "created_at": "2023-03-15T12:54:01.01Z"
+            },
+            {
+                "id": "17807243183240",
+                "user_id": "Uaf4f4b8ceec9e6a90d366fa93156d580",
+                "type": "",
+                "text": "teSt2055",
+                "created_at": "2023-03-15T12:55:31.29Z"
+            },
+            {
+                "id": "17807249427867",
+                "user_id": "Uaf4f4b8ceec9e6a90d366fa93156d580",
+                "type": "",
+                "text": "hello",
+                "created_at": "2023-03-15T12:56:40.493Z"
+            },
       
-    ]
-}`
+        ]
+    }
+
+### Get the messages of certain user 
 
 #### Request
 
-`GET` /messages?userId=<userid>
+`GET` /messages?userId=&lt,userid&gt,
 
     https://b558-2001-b011-381e-3046-1c14-8d3f-5276-3bc6.jp.ngrok.io/repeat/messages?UserId=U2dde8dd76c5cf5f13231d7abf82d1178
 
 #### Response
 
-`
-{
-    "messages list": [
-        {
-            "id": "17807548717269",
-            "user_id": "U2dde8dd76c5cf5f13231d7abf82d1178",
-            "type": "",
-            "text": "test1",
-            "created_at": "2023-03-15T13:53:34.962Z"
-        },
-        {
-            "id": "17807647591894",
-            "user_id": "U2dde8dd76c5cf5f13231d7abf82d1178",
-            "type": "",
-            "text": "test2",
-            "created_at": "2023-03-15T14:13:49.111Z"
-        }
-    ]
-}
-`
+    {
+        "messages list": [
+            {
+                "id": "17807548717269",
+                "user_id": "U2dde8dd76c5cf5f13231d7abf82d1178",
+                "type": "",
+                "text": "test1",
+                "created_at": "2023-03-15T13:53:34.962Z"
+            },
+            {
+                "id": "17807647591894",
+                "user_id": "U2dde8dd76c5cf5f13231d7abf82d1178",
+                "type": "",
+                "text": "test2",
+                "created_at": "2023-03-15T14:13:49.111Z"
+            }
+        ]
+    }
 
 ### Send message back to line, and then make linebot send the message to all users who has sent message to the linebot.
 
@@ -188,18 +188,20 @@ go run main.go
     https://b558-2001-b011-381e-3046-1c14-8d3f-5276-3bc6.jp.ngrok.io/repeat/send
 
 #### Request body
-`
-{
-    "message": "message you want to send"
-}
-`
+
+    {
+        "message": "message you want to send"
+    }
+
 
 #### Response
-`
-{
-    "message": "The message has been sent successfully"
-}
-`
+
+    {
+        "message": "The message has been sent successfully"
+    }
+    
+
+
 
 ## File/directory notes:
      
@@ -211,7 +213,7 @@ go run main.go
       * others: are not important.
 
 
-### Execute:
+
 
 
 
