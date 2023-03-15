@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"goLineBot/models"
 	db "goLineBot/mongo"
+	"goLineBot/service"
 	"log"
 	"net/http"
 
 	"github.com/spf13/viper"
-	//"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
@@ -37,11 +39,6 @@ func main() {
 
 	lineConfig := lineconfig{viper.GetString("line.channel.secret"), viper.GetString("line.channel.access_token")}
 	dbAdress := viper.GetString("mongo.address") + viper.GetString("mongo.port")
-
-	//client := db.GetDBClient(dbAdress)
-	//var DB *mongo.Database
-	//DB = client.Database("goLinebot")
-
 	db.ConnetDB(dbAdress)
 
 	///Linebot sdk testing
@@ -49,7 +46,6 @@ func main() {
 	if err != nil {
 		panic("linebot connect error " + err.Error())
 	}
-
 	app.POST("/test", func(c *gin.Context) {
 		events, err := bot.ParseRequest(c.Request)
 		if err != nil {
@@ -64,6 +60,9 @@ func main() {
 		for _, event := range events {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage:
+				newMessage := models.Message{ID: message.ID, UserID: event.Source.UserID, Type: string(message.Type()), Text: message.Text, CreatedAt: event.Timestamp}
+				fmt.Println(message)
+				service.SaveMessage(&newMessage)
 				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
 					log.Print(err)
 				}
