@@ -74,7 +74,8 @@ func (lbc *LineBotController) SendHandler(bot *linebot.Client) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"message": "The message has been sent successfully",
+			"success": "The message has been sent successfully",
+			"message": sendingMessage,
 		})
 	}
 }

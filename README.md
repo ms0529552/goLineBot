@@ -197,7 +197,11 @@ go run main.go
 #### Response
 
     {
-        "message": "The message has been sent successfully"
+    "message": {
+        "type": "text",
+        "text": "message you want to send"
+    },
+    "success": "The message has been sent successfully"
     }
     
 
