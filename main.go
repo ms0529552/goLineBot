@@ -1,22 +1,18 @@
 package main
 
 import (
-	"context"
-	"fmt"
+	db "goLineBot/mongo"
 	"log"
 	"net/http"
-	"time"
+
+	"github.com/spf13/viper"
+	//"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
-	"github.com/spf13/viper"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-const configPath = "."
+const configPath = "./configs"
 const configType = "yaml"
 const configName = "config"
 
@@ -40,26 +36,13 @@ func main() {
 	}
 
 	lineConfig := lineconfig{viper.GetString("line.channel.secret"), viper.GetString("line.channel.access_token")}
-	dbAddress := viper.GetString("mongo.address") + viper.GetString("mongo.port")
+	dbAdress := viper.GetString("mongo.address") + viper.GetString("mongo.port")
 
-	//mongodb setup
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	//client := db.GetDBClient(dbAdress)
+	//var DB *mongo.Database
+	//DB = client.Database("goLinebot")
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbAddress))
-
-	// Check if successfully connected
-	err = client.Ping(ctx, readpref.Primary())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Connected to MongoDB!")
-	defer func() {
-		if err = client.Disconnect(ctx); err != nil {
-			panic(err)
-		}
-	}()
+	db.ConnetDB(dbAdress)
 
 	///Linebot sdk testing
 	bot, err := linebot.New(lineConfig.secret, lineConfig.accessToken)
@@ -67,7 +50,7 @@ func main() {
 		panic("linebot connect error " + err.Error())
 	}
 
-	app.POST("/callback", func(c *gin.Context) {
+	app.POST("/test", func(c *gin.Context) {
 		events, err := bot.ParseRequest(c.Request)
 		if err != nil {
 			if err == linebot.ErrInvalidSignature {
