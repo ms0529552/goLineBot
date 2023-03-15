@@ -34,9 +34,11 @@ func ConnetDB(dbAdress string) {
 	fmt.Println("mongoDB connected at: " + dbAdress)
 }
 
-func GetDBClient(dbAdress string) *mongo.Client {
-	if DBclient == nil {
-		ConnetDB(dbAdress)
-	}
-	return DBclient
-}
+//For now there's no need to use below function, however, keep it for future.
+
+// func GetDBClient(dbAdress string) *mongo.Client {
+// 	if DBclient == nil {
+// 		ConnetDB(dbAdress)
+// 	}
+// 	return DBclient
+// }
