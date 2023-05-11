@@ -5,9 +5,14 @@ import (
 
 	"goLineBot/controller"
 
+	"goLineBot/migration"
+
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"github.com/spf13/viper"
+
+	//openai "github.com/sashabaranov/go-openai"
+	"goLineBot/gpt"
 )
 
 const configPath = "./configs"
@@ -34,11 +39,17 @@ func main() {
 	//Connect to db
 	db.ConnetDB(dbAdress)
 
+	//
+	migration.SaveAllCanMessages()
+
 	//Geting linebot client through the channel secret and access token
 	bot, err := linebot.New(viper.GetString("line.channel.secret"), viper.GetString("line.channel.access_token"))
 	if err != nil {
 		panic("linebot connect error " + err.Error())
 	}
+
+	//Connect to chatGpt
+	gpt.Connect(viper.GetString("openApi.go_line_bot.token"))
 
 	lineBotController := &controller.LineBotController{}
 	messagesController := &controller.MessagesController{}

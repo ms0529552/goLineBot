@@ -14,7 +14,3 @@ type User struct {
 	Profile       Profile
 	ChatGptSwitch bool `json:"chatGptSwitch" bson:"chatGptSwitch"`
 }
-
-func (user User) CheckGptSwitch() bool {
-	return user.ChatGptSwitch
-}

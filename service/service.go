@@ -135,7 +135,6 @@ func GetAllMessages() ([]models.Message, error) {
 	return messagesList, err
 
 }
-
 func ChangeGptSwitch(userId string) {
 	usersCollection := db.DBclient.Database("goLineBot").Collection("users")
 
@@ -151,5 +150,15 @@ func ChangeGptSwitch(userId string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+}
+
+func FindCanMessagesById(id string) (*models.CanMessage, error) {
+	collection := db.DBclient.Database("goLineBot").Collection("can_messages")
+
+	var canMessage *models.CanMessage
+	filter := bson.M{"id": id}
+	err := collection.FindOne(context.Background(), filter).Decode(&canMessage)
+	return canMessage, err
 
 }

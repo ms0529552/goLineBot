@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,8 +11,11 @@ import (
 	"goLineBot/models"
 	"goLineBot/service"
 
+	"goLineBot/gpt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
+	"github.com/sashabaranov/go-openai"
 )
 
 type LineBotController struct{}
@@ -153,10 +157,43 @@ func MessageHandler(event *linebot.Event, bot *linebot.Client) {
 			CreatedAt: event.Timestamp,
 		}
 		log.Println(message)
+		user, getUserErr := service.FindUserById(userId)
+		if getUserErr != nil {
+			log.Print(getUserErr)
+			canMessage, err := service.FindCanMessagesById("0")
+			if err != nil {
+				log.Print(err)
+			}
+			if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(canMessage.Content)).Do(); err != nil {
+				log.Print(err)
+			}
+
+		}
+
 		service.SaveMessage(&newMessage, bot)
+
 		if strings.HasPrefix(message.Text, "!") {
 			command := strings.TrimPrefix(message.Text, "!")
-			CommandHandler(command, userId)
+			commandId := CommandHandler(command, userId)
+			if commandId != " " {
+				canMessage, err := service.FindCanMessagesById(commandId)
+				if err != nil {
+					log.Print(err)
+				}
+				if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(canMessage.Content)).Do(); err != nil {
+					log.Print(err)
+				}
+			}
+
+			return
+		}
+
+		if user.ChatGptSwitch {
+			gptReplyMessage := gptMessageHandler(message.Text)
+			if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(gptReplyMessage)).Do(); err != nil {
+				log.Print(err)
+			}
+			return
 		}
 
 		if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
@@ -166,9 +203,48 @@ func MessageHandler(event *linebot.Event, bot *linebot.Client) {
 
 }
 
-func CommandHandler(command, userId string) {
+func CommandHandler(command, userId string) string {
 	switch command {
 	case "gpt":
 		service.ChangeGptSwitch(userId)
+		return " "
+	case "help":
+		return "1"
+	case "command":
+		return "2"
+	case "status":
+		user, err := service.FindUserById(userId)
+
+		if err != nil {
+			log.Print(err)
+		}
+		if user.ChatGptSwitch {
+			return "100"
+		} else {
+			return "101"
+		}
+
 	}
+	return " "
+}
+
+func gptMessageHandler(sendingMessage string) string {
+
+	resp, err := gpt.GptClient.CreateChatCompletion(
+		context.Background(),
+		openai.ChatCompletionRequest{
+			Model: openai.GPT3Dot5Turbo,
+			Messages: []openai.ChatCompletionMessage{
+				{Role: openai.ChatMessageRoleUser, Content: sendingMessage},
+			},
+		},
+	)
+
+	if err != nil {
+		log.Print(err)
+		return ""
+	}
+
+	return resp.Choices[0].Message.Content
+
 }
