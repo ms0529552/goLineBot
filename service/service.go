@@ -2,17 +2,18 @@ package service
 
 import (
 	"context"
-	//"log"
+	"log"
 	"time"
 
 	"goLineBot/models"
 	db "goLineBot/mongo"
 
+	"github.com/line/line-bot-sdk-go/v7/linebot"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Save message into the collection messages.
-func SaveMessage(message *models.Message) error {
+func SaveMessage(message *models.Message, bot *linebot.Client) error {
 	messagesCollection := db.DBclient.Database("goLineBot").Collection("messages")
 	_, err := messagesCollection.InsertOne(context.Background(), message)
 	if err != nil {
@@ -22,10 +23,21 @@ func SaveMessage(message *models.Message) error {
 	usersCollection := db.DBclient.Database("goLineBot").Collection("users")
 
 	var user models.User
-	filter := bson.M{"user_id": message.UserID}
+
+	filter := bson.M{"userId": message.UserID}
 	err = usersCollection.FindOne(context.Background(), filter).Decode(&user)
+
 	if err != nil {
-		newUser := models.User{UserID: message.UserID, CreatedAt: time.Now()}
+		var newUser models.User
+		newUser.UserID = message.UserID
+		newUser.ChatGptSwitch = false
+		ctx := context.Background()
+		userProfile, gettingProfieErr := bot.GetProfile(message.UserID).WithContext(ctx).Do()
+		if gettingProfieErr != nil {
+			return gettingProfieErr
+		}
+		newUser.Profile = models.Profile(*userProfile)
+		newUser.CreatedAt = time.Now()
 		NewUser(&newUser)
 	}
 
@@ -46,7 +58,7 @@ func NewUser(user *models.User) error {
 func FindUserById(searchId string) (*models.User, error) {
 	usersCollection := db.DBclient.Database("goLineBot").Collection("users")
 	var user *models.User
-	filter := bson.M{"user_id": searchId}
+	filter := bson.M{"userId": searchId}
 	err := usersCollection.FindOne(context.Background(), filter).Decode(&user)
 	return user, err
 
@@ -80,7 +92,7 @@ func GetMessagesByUser(user *models.User) ([]models.Message, error) {
 	messagesCollection := db.DBclient.Database("goLineBot").Collection("messages")
 
 	var messagesByUser []models.Message
-	filter := bson.M{"user_id": user.UserID}
+	filter := bson.M{"userId": user.UserID}
 	cursor, err := messagesCollection.Find(context.Background(), filter)
 	if err != nil {
 		return nil, err
@@ -121,5 +133,23 @@ func GetAllMessages() ([]models.Message, error) {
 		return nil, err
 	}
 	return messagesList, err
+
+}
+
+func ChangeGptSwitch(userId string) {
+	usersCollection := db.DBclient.Database("goLineBot").Collection("users")
+
+	user, err := FindUserById(userId)
+
+	filter := bson.M{"userId": bson.M{"$eq": userId}}
+	update := bson.M{"$set": bson.M{"chatGptSwitch": true}}
+	if user.ChatGptSwitch {
+		update = bson.M{"$set": bson.M{"chatGptSwitch": false}}
+	}
+
+	_, err = usersCollection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }

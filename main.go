@@ -45,6 +45,8 @@ func main() {
 	//Api that receives message from line webhook and save the user info and message in MongoDB, then repeat the message again to user.
 	app.POST("/repeat", lineBotController.RepeatHandler(bot))
 
+	app.POST("/webhook", lineBotController.EventsHandler(bot))
+
 	//Api that send message back to line, and then make linebot send the message to all users who has sent message to the linebot.
 	app.POST("/send", lineBotController.SendHandler(bot))
 
