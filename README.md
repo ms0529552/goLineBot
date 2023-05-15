@@ -1,6 +1,6 @@
-# goLineBot
+# LineBot ChatGPT Service
 
-GoLineBot is a web-based service created by golang, some go-libs, and linebot-sdk to deal with basic message sending and receiving between users and linebot. 
+This is a LINE Bot developed using Go that allows users to access the ChatGPT service. Users can engage in conversations with ChatGPT and receive intelligent responses on the LINE platform.
 
 ## Prerequisites
 
@@ -10,17 +10,23 @@ GoLineBot is a web-based service created by golang, some go-libs, and linebot-sd
 
 
 
-## Installation
+## Getting Started
 
-### Golang libs
+### 1. Register a LINE Developer Account
 
-There are several golang libs be used, all of them are listed below:
+Before getting started, you need to register a LINE Developer account. Visit the LINE Developers website (https://developers.line.biz/) and create a new account. Under your account, create a new LINE Bot and obtain the necessary authentication credentials.
 
-* [gin](https://github.com/gin-gonic/gin)
-* [viper](https://github.com/spf13/viper)
-* [mongo driver](https://github.com/mongodb/mongo-go-driver)
-* [cobra](https://github.com/spf13/cobra)
+### 2. Download the Code
 
+Download the code for this project to your local environment. You can use the Git Clone command:
+
+```bash
+git clone https://github.com/ms0529552/goLineBot.git
+```
+
+### 3. Install Dependencies
+
+This project relies on several third-party libraries. You need to install these dependencies using `go mod` or any other appropriate tool.
 
 You can simply used below command line order to install all the libs if you want to keep the go.mod in this repo.
 
@@ -29,22 +35,8 @@ go mod download
 
 ```
 
-Otherwise, using below command line order to install these go libs.
 
-```bash
-go init
-
-go get -u github.com/gin-gonic/gin 
-
-go get github.com/spf13/viper
-
-go get -u github.com/spf13/cobra@latest
-
-go get go.mongodb.org/mongo-driver/mongo
-
-```
-
-### Docker access method
+### 4.Set mongo on docker
 
 
 And for the project, we need to run mongo with docker(with mongo:4.4).
@@ -80,8 +72,39 @@ docker ps
 ```
 
 
-### ngrok
+### 5. Set Environment Variables
 
+Before starting, set the following environment variables:
+
+- `LINE_CHANNEL_SECRET`: The Channel Secret for your LINE Bot.
+- `LINE_CHANNEL_TOKEN`: The Channel Access Token for your LINE Bot.
+- `OPENAI_API_KEY`: Your API key for the ChatGPT service.
+
+You can set these variables in a `.yaml` file. The default set will read the ./configs/config.yaml, you might need build one. Below is a example showed:
+
+```yaml
+name: "goLineBot"
+mongo:
+  port: 27017
+  address: "mongodb://localhost:"
+line:
+  channel:
+    secret:  `LINE_CHANNEL_SECRET`
+    access_token: `LINE_CHANNEL_TOKEN`
+openApi:
+  go_line_bot:
+    token: `OPENAI_API_KEY`
+
+```
+### 6. Set the Webhook URL
+
+In your LINE Bot settings, configure the Webhook URL to point to your server's URL. You can use tools like ngrok (https://ngrok.com/) to expose your local server to the internet and obtain an accessible URL.
+
+
+
+
+### 7. Usw ngrok to get https url
+ 
 To make line platform interact with the application through webhooks, we need to use ngrok generate https url mapping to our app servers.
 
 You can download ngrok [here](https://ngrok.com/)
@@ -102,7 +125,7 @@ For example `https://b558-2001-b011-381e-3046-1c14-8d3f-5276-3bc6.jp.ngrok.io/re
 
 
 
-## Execute
+## 8.Execute
 
 To run the server you can type
 
@@ -228,3 +251,13 @@ go run main.go
 
 
 
+
+
+### Reference
+
+There are several golang libs be used, all of them are listed below:
+
+* [gin](https://github.com/gin-gonic/gin)
+* [viper](https://github.com/spf13/viper)
+* [mongo driver](https://github.com/mongodb/mongo-go-driver)
+* [cobra](https://github.com/spf13/cobra)
