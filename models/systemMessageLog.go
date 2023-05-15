@@ -3,7 +3,8 @@ package models
 import "time"
 
 type SystemMessageLog struct {
-	ReplyID     string    `json:"id" bson:"_id"`
+	ID          string    `json:"id" bson:"id"`
+	ReplyID     string    `json:"replyId" bson:"replyId"`
 	ReplyUserID string    `json:"userId" bson:"userId"`
 	Type        string    `json:"type" bson:"type"`
 	Text        string    `json:"text" bson:"text"`

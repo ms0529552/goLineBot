@@ -149,6 +149,7 @@ func MessageHandler(event *linebot.Event, bot *linebot.Client) {
 	case *linebot.TextMessage:
 
 		userId := event.Source.UserID
+		messageId := message.ID
 		newMessage := models.Message{
 			ID:        message.ID,
 			UserID:    userId,
@@ -157,6 +158,13 @@ func MessageHandler(event *linebot.Event, bot *linebot.Client) {
 			CreatedAt: event.Timestamp,
 		}
 		log.Println(message)
+
+		newSystemMessage := models.SystemMessageLog{
+			ReplyID:     messageId,
+			ReplyUserID: userId,
+			CreatedAt:   event.Timestamp,
+		}
+
 		user, getUserErr := service.FindUserById(userId)
 		if getUserErr != nil {
 			log.Print(getUserErr)
@@ -164,10 +172,14 @@ func MessageHandler(event *linebot.Event, bot *linebot.Client) {
 			if err != nil {
 				log.Print(err)
 			}
-			if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(canMessage.Content)).Do(); err != nil {
-				log.Print(err)
+			_, replyErr := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(canMessage.Content)).Do()
+			if replyErr != nil {
+				log.Print(replyErr)
 			}
 
+			newSystemMessage.Text = canMessage.Content
+			newSystemMessage.Type = "can"
+			service.SaveSystemMessage(newSystemMessage)
 		}
 
 		service.SaveMessage(&newMessage, bot)
@@ -180,25 +192,38 @@ func MessageHandler(event *linebot.Event, bot *linebot.Client) {
 				if err != nil {
 					log.Print(err)
 				}
-				if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(canMessage.Content)).Do(); err != nil {
-					log.Print(err)
+				_, replyErr := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(canMessage.Content)).Do()
+				if replyErr != nil {
+					log.Print(replyErr)
 				}
+				newSystemMessage.Text = canMessage.Content
+				newSystemMessage.Type = "can"
+				service.SaveSystemMessage(newSystemMessage)
 			}
-
 			return
 		}
 
 		if user.ChatGptSwitch {
 			gptReplyMessage := gptMessageHandler(message.Text)
-			if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(gptReplyMessage)).Do(); err != nil {
+
+			_, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(gptReplyMessage)).Do()
+
+			if err != nil {
 				log.Print(err)
 			}
+			newSystemMessage.Text = gptReplyMessage
+			newSystemMessage.Type = "gpt3.5"
+			service.SaveSystemMessage(newSystemMessage)
 			return
 		}
 
-		if _, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
+		_, err := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do()
+		if err != nil {
 			log.Print(err)
 		}
+		newSystemMessage.Text = message.Text
+		newSystemMessage.Type = "repeat"
+		service.SaveSystemMessage(newSystemMessage)
 	}
 
 }

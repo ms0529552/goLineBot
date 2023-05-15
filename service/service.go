@@ -44,6 +44,16 @@ func SaveMessage(message *models.Message, bot *linebot.Client) error {
 	return err
 }
 
+func SaveSystemMessage(message models.SystemMessageLog) error {
+	messagesCollection := db.DBclient.Database("goLineBot").Collection("system_messages_log")
+	_, err := messagesCollection.InsertOne(context.Background(), message)
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+	return err
+}
+
 // Insert new user into the collection users.
 func NewUser(user *models.User) error {
 	collection := db.DBclient.Database("goLineBot").Collection("users")
