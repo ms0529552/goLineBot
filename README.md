@@ -142,7 +142,7 @@ go run main.go
 
 `GET` /messages
 
-    https://b558-2001-b011-381e-3046-1c14-8d3f-5276-3bc6.jp.ngrok.io/repeat/messages
+    https://b558-2001-b011-381e-3046-1c14-8d3f-5276-3bc6.jp.ngrok.io/messages
 
 #### Response
 
@@ -179,7 +179,7 @@ go run main.go
 
 `GET` /messages?userId=\<userid\>
 
-    https://b558-2001-b011-381e-3046-1c14-8d3f-5276-3bc6.jp.ngrok.io/repeat/messages?UserId=U2dde8dd76c5cf5f13231d7abf82d1178
+    https://b558-2001-b011-381e-3046-1c14-8d3f-5276-3bc6.jp.ngrok.io/messages?UserId=U2dde8dd76c5cf5f13231d7abf82d1178
 
 #### Response
 
@@ -208,7 +208,7 @@ go run main.go
 
 `POST` /send
 
-    https://b558-2001-b011-381e-3046-1c14-8d3f-5276-3bc6.jp.ngrok.io/repeat/send
+    https://b558-2001-b011-381e-3046-1c14-8d3f-5276-3bc6.jp.ngrok.io/send
 
 #### Request body
 
