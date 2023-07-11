@@ -138,6 +138,25 @@ func (mc *MessagesController) MessagesByUserHandler() gin.HandlerFunc {
 
 func FollowHandler(event *linebot.Event, bot *linebot.Client) {
 
+	userId := event.Source.UserID
+	newSystemMessage := models.SystemMessageLog{
+		ReplyUserID: userId,
+		CreatedAt:   event.Timestamp,
+	}
+
+	canMessage, err := service.FindCanMessagesById("0")
+	if err != nil {
+		log.Print(err)
+	}
+	_, replyErr := bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(canMessage.Content)).Do()
+	if replyErr != nil {
+		log.Print(replyErr)
+	}
+
+	newSystemMessage.Text = canMessage.Content
+	newSystemMessage.Type = "can"
+	service.SaveSystemMessage(newSystemMessage)
+	service.SaveFollowingUser(userId, bot)
 }
 
 func UnFollowHandler(event *linebot.Event, bot *linebot.Client) {
