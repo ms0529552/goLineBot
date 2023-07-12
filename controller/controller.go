@@ -248,10 +248,20 @@ func MessageHandler(event *linebot.Event, bot *linebot.Client) {
 }
 
 func CommandHandler(command, userId string) string {
+
 	switch command {
 	case "gpt":
+
 		service.ChangeGptSwitch(userId)
-		return " "
+		user, err := service.FindUserById(userId)
+		if err != nil {
+			log.Print(err)
+		}
+		if user.ChatGptSwitch {
+			return "102"
+		} else {
+			return "103"
+		}
 	case "help":
 		return "1"
 	case "command":

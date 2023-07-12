@@ -19,9 +19,11 @@ func SaveAllCanMessages() {
 			{ID: "2", Description: "command set", Content: "目前有開放的指令及如下:\n!help 可以取得說明以及幫助\n!command 可以檢視目前所有的指令集\n !gpt 可以開啟或關閉chatgpt的功能，預設為關閉\n !status 可以檢視目前chatgpt功能的開啟關閉狀態"},
 			{ID: "100", Description: "command set", Content: `目前您的chatgpt功能為開啟狀態，若要關閉請輸入"!gpt"`},
 			{ID: "101", Description: "command set", Content: `目前您的chatgpt功能為關閉狀態，若要開啟請輸入"!gpt"`},
+			{ID: "102", Description: "command set", Content: `您已成功開啟gpt功能`},
+			{ID: "103", Description: "command set", Content: `您已成功關閉gpt功能`},
 		}
 
-		collection := db.DBclient.Database("goLineBot").Collection("can_mesaages")
+		collection := db.DBclient.Database("goLineBot").Collection("can_messages")
 		for _, canMessage := range canMessages {
 			collection.InsertOne(context.Background(), canMessage)
 		}

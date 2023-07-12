@@ -44,6 +44,32 @@ func SaveMessage(message *models.Message, bot *linebot.Client) error {
 	return err
 }
 
+func SaveFollowingUser(userId string, bot *linebot.Client) error {
+
+	usersCollection := db.DBclient.Database("goLineBot").Collection("users")
+
+	var user models.User
+
+	filter := bson.M{"userId": userId}
+	err := usersCollection.FindOne(context.Background(), filter).Decode(&user)
+
+	if err != nil {
+		var newUser models.User
+		newUser.UserID = userId
+		newUser.ChatGptSwitch = false
+		ctx := context.Background()
+		userProfile, gettingProfieErr := bot.GetProfile(userId).WithContext(ctx).Do()
+		if gettingProfieErr != nil {
+			return gettingProfieErr
+		}
+		newUser.Profile = models.Profile(*userProfile)
+		newUser.CreatedAt = time.Now()
+		NewUser(&newUser)
+	}
+
+	return err
+}
+
 func SaveSystemMessage(message models.SystemMessageLog) error {
 	messagesCollection := db.DBclient.Database("goLineBot").Collection("system_messages_log")
 	_, err := messagesCollection.InsertOne(context.Background(), message)
